@@ -3,6 +3,10 @@
 꼬마 마녀 캐시가 테라리움 속 작은 생물들을 몰래 마법으로 도와주는 퍼즐 게임 프로토타입입니다.
 5×5 칸 위의 블록에서 '워드'를 가져와 다른 블록에 붙여 세상을 바꿉니다.
 
+## 플레이
+
+https://panasaga.github.io/Enchant_In_Chart/
+
 ## 실행
 
 `web/index.html` 을 브라우저로 열면 됩니다. 빌드 과정은 없습니다.
@@ -14,6 +18,15 @@ python -m http.server 8123 --directory web
 ```
 
 그다음 `http://localhost:8123` 에 접속합니다.
+
+## 배포 (GitHub Pages)
+
+`web/` 폴더 내용이 `gh-pages` 브랜치로 배포됩니다. `main` 에 커밋한 뒤 아래 두 줄로 사이트를 갱신합니다.
+
+```bash
+git push
+git subtree push --prefix web origin gh-pages
+```
 
 ## 폴더
 
