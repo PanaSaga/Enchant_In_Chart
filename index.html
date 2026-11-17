@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Enchant In Chart</title>
+<link rel="stylesheet" href="css/style.css?v=14">
+</head>
+<body>
+<div id="app">
+  <!-- 공통 배경 -->
+  <div id="bg">
+    <img class="bg-top" src="assets/decor/greenhouse.png" alt="">
+    <img class="bg-moss" src="assets/decor/moss-strip.png" alt="">
+  </div>
+
+  <!-- 타이틀 -->
+  <section id="scr-title" class="screen">
+    <div class="title-logo"><div class="logo-main" data-i18n="ui.title"></div><div class="logo-sub" data-i18n="ui.titleSub"></div></div>
+    <div class="title-art">
+      <div class="n-portrait title-frame"><img src="assets/portraits/cache-happy.png" alt=""></div>
+      <img class="title-terrarium" src="assets/decor/terrarium.png" alt="">
+    </div>
+    <button id="btnStart" class="big-btn n-btn" data-i18n="ui.start"></button>
+    <div class="lang-row" data-langrow></div>
+  </section>
+
+  <!-- 스테이지 선택 -->
+  <section id="scr-select" class="screen">
+    <div class="top-row">
+      <div class="n-pill coin-pill"><img src="assets/icons/coin.png" alt=""><span data-coin></span></div>
+      <button class="n-iconbtn round-btn" data-open-settings><img src="assets/icons/settings.png" alt=""></button>
+    </div>
+    <div class="journal n-objective">
+      <h1 data-i18n="ui.journal"></h1>
+      <div id="chapterList"></div>
+    </div>
+    <div class="dummy-row">
+      <button class="n-btn small-btn" data-dummy data-i18n="ui.attend"></button>
+      <button class="n-btn small-btn" data-dummy data-i18n="ui.ad"></button>
+      <button class="n-btn small-btn" data-dummy data-i18n="ui.shop"></button>
+    </div>
+    <img class="deco-books" src="assets/decor/books.png" alt="">
+    <img class="deco-terrarium" src="assets/decor/terrarium.png" alt="">
+  </section>
+
+  <!-- 스토리 컷 -->
+  <section id="scr-story" class="screen">
+    <button id="btnSkip" class="n-btn small-btn" data-i18n="ui.skip"></button>
+    <div id="cut" class="n-portrait">
+      <div id="cutArt"></div>
+      <div id="cutLabel"></div>
+    </div>
+    <div id="storyBox" class="n-speech">
+      <div id="storyTxt"></div>
+      <div class="tap-next" data-i18n="ui.tapNext"></div>
+    </div>
+  </section>
+
+  <!-- 인게임 -->
+  <section id="scr-game" class="screen">
+    <div id="portrait" class="n-portrait"><img id="portraitImg" src="assets/portraits/cache-neutral.png" alt=""></div>
+    <div id="hearts" class="n-pill"></div>
+    <div id="coinPill" class="n-pill coin-pill"><img src="assets/icons/coin.png" alt=""><span data-coin></span></div>
+    <button id="btnSettings" class="n-iconbtn" data-open-settings><img src="assets/icons/settings.png" alt=""></button>
+    <img id="speechTail" src="assets/ui/speech-tail.png" alt="">
+    <div id="speech" class="n-speech"><div id="speechTxt"></div><div id="speechNext">▼</div></div>
+    <div id="objective" class="n-objective"><div id="objTxt"></div></div>
+    <div id="objLabel" class="n-objlabel"><img src="assets/icons/chevron-left.png" alt=""><span data-i18n="ui.objective"></span><img src="assets/icons/chevron-right.png" alt=""></div>
+    <div id="stars"></div>
+
+    <div id="central" class="n-central"></div>
+    <div id="boardFrame" class="n-board"></div>
+    <div id="board"><div id="cells"></div><div id="blocks"></div></div>
+    <div id="tray" class="n-tray"></div>
+    <button id="btnHint" class="n-iconbtn"><img src="assets/icons/hint.png" alt=""></button>
+    <button id="btnUndo" class="n-iconbtn"><img src="assets/icons/undo.png" alt=""></button>
+
+    <div id="inspector" class="n-inspector">
+      <div id="insPreview" class="n-preview"><div id="insImg"></div></div>
+      <div id="insHead"><span id="insTag" class="n-tag"></span><span id="insName"></span></div>
+      <div id="insWordsLabel" data-i18n="ui.words"></div>
+      <div id="insStates"></div>
+      <div class="ins-hr"></div>
+      <div id="insKws"></div>
+      <div class="ins-vr"></div>
+      <div id="selKw"></div>
+      <div id="descLabel"><span data-i18n="ui.desc"></span><i></i></div>
+      <div id="descBox" class="n-desc"><div id="descTxt"></div></div>
+    </div>
+    <img class="deco-books" src="assets/decor/books.png" alt="">
+    <img class="deco-terrarium" src="assets/decor/terrarium.png" alt="">
+
+    <svg id="dim" viewBox="0 0 1024 1536"><path id="dimPath" fill="#000" fill-rule="evenodd"></path></svg>
+    <div id="blocker"></div>
+    <div id="finger">👆</div>
+  </section>
+
+  <!-- 클리어 결과 -->
+  <section id="scr-result" class="screen">
+    <div class="result-panel n-objective">
+      <h1 data-i18n="ui.clear"></h1>
+      <div class="result-stage" id="resStage"></div>
+      <div class="n-portrait result-portrait"><img src="assets/portraits/cache-victory.png" alt=""></div>
+      <div id="resStars"></div>
+      <div id="resMistakes"></div>
+      <div class="result-reward"><span data-i18n="ui.reward"></span><img src="assets/icons/coin.png" alt=""><b id="resCoin"></b></div>
+      <button id="btnBuyStar" class="n-btn small-btn"></button>
+      <button id="btnNext" class="big-btn n-btn" data-i18n="ui.next"></button>
+      <div class="result-row">
+        <button id="btnRetry" class="n-btn small-btn" data-i18n="ui.retry"></button>
+        <button id="btnToSelect" class="n-btn small-btn" data-i18n="ui.toSelect"></button>
+      </div>
+    </div>
+    <div class="top-row"><div class="n-pill coin-pill"><img src="assets/icons/coin.png" alt=""><span data-coin></span></div></div>
+  </section>
+
+  <div id="modal"><div id="modalBox" class="n-objective"></div></div>
+  <div id="toast"></div>
+</div>
+
+<script src="js/i18n.js?v=14"></script>
+<script src="js/stages.js?v=14"></script>
+<script src="js/engine.js?v=14"></script>
+<script src="js/game.js?v=14"></script>
+</body>
+</html>
