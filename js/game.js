@@ -260,6 +260,7 @@
   const BADGE_IMG = { move: 'word-move', growH: 'word-grow-horizontal', growV: 'word-grow-vertical' };
   const place = (el, x, y, w, h) => { el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.width = w + 'px'; el.style.height = h + 'px'; };
   const bbox = cells => { const xs = cells.map(c => c[0]), ys = cells.map(c => c[1]); const x = Math.min.apply(null, xs), y = Math.min.apply(null, ys); return { x, y, w: Math.max.apply(null, xs) - x + 1, h: Math.max.apply(null, ys) - y + 1 }; };
+  const isRect = cells => { const bb = bbox(cells); return cells.length === bb.w * bb.h; };
   const cellsNow = b => (G.preview && G.preview.id === b.id ? G.preview.cells : b.cells);
   function renderBoard() {
     const layer = $('blocks'); layer.innerHTML = '';
@@ -292,12 +293,14 @@
         el.appendChild(tile);
       });
       const first = cells[0], last = cells[cells.length - 1];
+      if (d.render !== 'figure' && cells.length > 1 && isRect(cells)) { const bb = bbox(cells), o = mk('div', 'multi-box'); place(o, bb.x * C, bb.y * C, bb.w * C, bb.h * C); el.appendChild(o); }
       el.style.transformOrigin = (first[0] * C + C / 2) + 'px ' + (first[1] * C + C / 2) + 'px';
       if (G.sel === b.id) el.classList.add('sel');
       if (g && g.id === b.id && g.k !== 'chip' && g.k !== 'take' && !G.waiting) {
         // 노란 테두리: 블록 외곽선만 그린다
         el.classList.add('hl');
-        cells.forEach(c => {
+        if (isRect(cells)) { const bb = bbox(cells), o = mk('div', 'hl-box'); place(o, bb.x * C - 14, bb.y * C - 14, bb.w * C + 28, bb.h * C + 28); el.appendChild(o); }
+        else cells.forEach(c => {
           [[-1, 0, 'l'], [1, 0, 'r'], [0, -1, 't'], [0, 1, 'b']].forEach(s => {
             if (E.has(cells, c[0] + s[0], c[1] + s[1])) return;
             const e = mk('div', 'hl-edge');
@@ -311,7 +314,10 @@
       }
       if (!G.known[b.id]) { el.classList.add('fresh'); G.known[b.id] = 1; }
       if (G.shake === b.id) el.classList.add('shake');
-      if (dragKw && (!src || src.id !== b.id) && E.canEnchant(G.stage, b, dragKw)) el.classList.add('can');
+      if (dragKw && (!src || src.id !== b.id) && E.canEnchant(G.stage, b, dragKw)) {
+        if (isRect(cells)) { const bb = bbox(cells), o = mk('div', 'can-box'); place(o, bb.x * C - 6, bb.y * C - 6, bb.w * C + 12, bb.h * C + 12); el.appendChild(o); el.style.zIndex = 2; }
+        else el.classList.add('can');
+      }
       if (d.enchantable && BADGE_IMG[b.kw.yellow]) {
         const u = E.usesOf(b, b.kw.yellow), bd = mk('div', 'badge'); bd.style.backgroundImage = 'url(assets/guides/' + BADGE_IMG[b.kw.yellow] + '.png)';
         if (u != null) bd.appendChild(mk('span', 'cnt', String(u)));
@@ -338,30 +344,33 @@
       });
     }
   }
+  /* 늘릴 수 있는 방향 표시: 여러 칸은 지나온 길 + 시작점(grow-start)·화살촉(grow-arrowhead),
+     한 칸은 축 방향 양쪽 화살표(grow-horizontal / grow-vertical) */
   function drawGrowArrows(layer) {
     let body = '';
-    const P = c => (c[0] * C + C / 2) + ',' + (c[1] * C + C / 2);
+    const mid = c => [c[0] * C + C / 2, c[1] * C + C / 2];
+    const image = (href, x, y, w, h, extra) => '<image href="assets/guides/' + href + '.png" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"' + (extra || '') + '/>';
     G.state.blocks.forEach(b => {
       const k = b.kw.yellow; if (!k || !KW[k].grow) return;
       const cells = cellsNow(b);
-      let pts;
       if (cells.length > 1) {
-        pts = cells.map(P).join(' ');
-        body += '<circle cx="' + (cells[0][0] * C + C / 2) + '" cy="' + (cells[0][1] * C + C / 2) + '" r="12" fill="#f59a23" stroke="#fff" stroke-width="4"/>';
-        body += '<polyline points="' + pts + '" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>' +
-          '<polyline points="' + pts + '" fill="none" stroke="#f59a23" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ah)"/>';
-      } else {   // 한 칸: 늘릴 수 있는 축 방향 양쪽 화살표
-        const c = cells[0], cx = c[0] * C + C / 2, cy = c[1] * C + C / 2, h = KW[k].grow === 'w';
-        const a = h ? (cx - 40) + ',' + cy : cx + ',' + (cy - 40), z = h ? (cx + 40) + ',' + cy : cx + ',' + (cy + 40);
-        body += '<polyline points="' + a + ' ' + z + '" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" opacity=".85"/>' +
-          '<polyline points="' + a + ' ' + z + '" fill="none" stroke="#f59a23" stroke-width="9" stroke-linecap="round" marker-start="url(#ah2)" marker-end="url(#ah)"/>';
+        const pts = cells.map(c => mid(c).join(',')).join(' ');
+        const [ex, ey] = mid(cells[cells.length - 1]), [px, py] = mid(cells[cells.length - 2]);
+        const ang = Math.atan2(ey - py, ex - px) * 180 / Math.PI;
+        const [sx, sy] = mid(cells[0]);
+        body += '<polyline points="' + pts + '" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>' +
+          '<polyline points="' + pts + '" fill="none" stroke="#1F726A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>';
+        body += image('grow-start', sx - 20, sy - 20, 40, 40);
+        body += image('grow-arrowhead', ex - 18, ey - 26, 52, 52, ' transform="rotate(' + ang + ' ' + ex + ' ' + ey + ')"');
+      } else {
+        const [cx, cy] = mid(cells[0]);
+        body += KW[k].grow === 'w' ? image('grow-horizontal', cx - 52, cy - 25, 104, 49) : image('grow-vertical', cx - 26, cy - 54, 52, 108);
       }
     });
     if (!body) return;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'grow-arrow'); svg.setAttribute('viewBox', '0 0 700 700');
-    svg.innerHTML = '<defs><marker id="ah" markerWidth="5" markerHeight="5" refX="2.2" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5Z" fill="#f59a23"/></marker>' +
-      '<marker id="ah2" markerWidth="5" markerHeight="5" refX="2.8" refY="2.5" orient="auto"><path d="M5 0L0 2.5L5 5Z" fill="#f59a23"/></marker></defs>' + body;
+    svg.innerHTML = body;
     layer.appendChild(svg);
   }
   /* 보드 위 일회성 연출: ignite(3프레임) / warming / blocked */
