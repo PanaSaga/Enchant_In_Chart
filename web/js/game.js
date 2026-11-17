@@ -739,7 +739,7 @@
     const ph = G.tut.phase;
     if (ph === 'takeH' && kw === 'growH') {
       phase('heatClick');
-      say([L('uCount', 0, 'neutral', () => elHole('#tray .card[data-kw="growH"]', 8)), L('uH1', 0, 'worried'), L('uH1', 1, 'worried'), L('uH1', 2, 'neutral')], () => { const h = guideHeat(); if (h) forceClick(h.id); });
+      say([L('uApply', 0, 'neutral', () => elHole('#tray', 0).concat(elHole('#boardFrame', 0))), L('uApply', 1, 'happy'), L('uCount', 0, 'neutral', () => elHole('#tray .card[data-kw="growH"]', 8)), L('uH1', 0, 'worried'), L('uH1', 1, 'worried'), L('uH1', 2, 'neutral')], () => { const h = guideHeat(); if (h) forceClick(h.id); });
     } else if (ph === 'takeMove' && kw === 'move') {
       phase('treeClick');
       say([L('uM', 0, 'worried'), L('uM', 1, 'neutral')], () => forceClick('tree'));
@@ -772,7 +772,7 @@
     if (ph !== 'steamPull') return;
     if (b.cells.length > 1) { setGuide(steamPull(), { type: 'drag', id: 'steam' }); return; }   // B1까지 다 줄일 때까지 계속 안내
     phase('takeH'); select('steam');
-    say([L('t3', 0, 'worried'), L('tTake', 0, 'neutral'), L('tTake', 1, 'neutral'), L('tTake', 2, 'happy')], () => forceTake('steam', 'growH'));
+    say([L('t3', 0, 'worried'), L('tTake', 0, 'neutral'), L('tTake', 1, 'happy')], () => forceTake('steam', 'growH'));
   }
   function tutCampfire(id) {
     say([L('t10b', 0, 'happy', holesOf(id))]);
