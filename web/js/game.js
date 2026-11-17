@@ -14,6 +14,7 @@
     trayRect: { x: 752, y: 366, w: 250, h: 588 },
     inspectorRect: { x: 20, y: 1108, w: 984, h: 322 },
   };
+  const AV = '?v=2';   // 블록 그림을 바꿨을 때 브라우저 캐시를 피하는 버전 표시
   const KW = window.KEYWORDS, E = window.Engine, C = CONFIG.cell, BX = CONFIG.boardX, BY = CONFIG.boardY;
   const $ = id => document.getElementById(id);
   const app = $('app');
@@ -42,6 +43,7 @@
   function applyLang() {
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    $('titleLogo').src = 'assets/logos/title-' + lang + '.png'; $('clearLogo').src = 'assets/logos/clear-' + lang + '.png';
     applyLangRows(); renderCoins();
     if (current === 'select') renderSelect();
     if (current === 'story') renderStory();
@@ -89,18 +91,26 @@
   }
 
   /* ── 모달 ── */
-  function openModal(build) { const box = $('modalBox'); box.innerHTML = ''; build(box); $('modal').classList.add('on'); }
+  function openModal(build) { const box = $('modalBox'); box.className = 'm-popup'; box.innerHTML = ''; build(box); $('modal').classList.add('on'); }
   function closeModal() { $('modal').classList.remove('on'); }
   $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+  const img = (src, cls) => { const i = new Image(); i.src = src; i.alt = ''; if (cls) i.className = cls; return i; };
+  function popButton(cls, iconSrc, label, onclick) {
+    const b = mk('button', cls); if (iconSrc) b.appendChild(img(iconSrc)); b.appendChild(mk('span', '', label)); b.onclick = onclick; return b;
+  }
   function openSettings() {
     openModal(box => {
-      box.appendChild(mk('h2', '', t('ui.settings')));
+      const tab = mk('div', 'pop-tab');
+      tab.appendChild(img('assets/decor/mobile/hud-wildflower.png', 'deco l'));
+      tab.appendChild(img('assets/icons/settings.png')); tab.appendChild(mk('span', '', t('ui.settings')));
+      tab.appendChild(img('assets/decor/mobile/hud-wildflower.png', 'deco r'));
+      box.appendChild(tab);
       const row = mk('div', 'lang-row'); row.setAttribute('data-langrow', ''); box.appendChild(row);
       if (current === 'game') {
-        const r = mk('button', 'n-btn small-btn', t('ui.restart')); r.onclick = () => { closeModal(); startStage(G.stage.id); }; box.appendChild(r);
-        const s = mk('button', 'n-btn small-btn', t('ui.toSelect')); s.onclick = goSelect; box.appendChild(s);
+        box.appendChild(popButton('m-cream pop-btn', 'assets/icons/undo.png', t('ui.restart'), () => { closeModal(); startStage(G.stage.id); }));
+        box.appendChild(popButton('m-cream pop-btn', 'assets/icons/mobile/journal.png', t('ui.toSelect'), goSelect));
       }
-      const c = mk('button', 'n-btn small-btn', t('ui.close')); c.onclick = closeModal; box.appendChild(c);
+      box.appendChild(popButton('m-primary pop-close-btn', null, t('ui.close'), closeModal));
       applyLangRows();
     });
   }
@@ -111,6 +121,7 @@
   $('btnStart').onclick = goSelect;
   function goSelect() { show('select'); renderSelect(); }
   function starImgs(n) { let h = ''; for (let i = 0; i < 3; i++) h += '<img src="assets/icons/' + (i < n ? 'star' : 'star-off') + '.png" alt="">'; return h; }
+  const THUMB = { 1: 'assets/stage-thumbnails/first-fire.png', 2: 'assets/stage-thumbnails/rain.png', 3: 'assets/stage-thumbnails/river.png' };
   function renderSelect() {
     const list = $('chapterList'); list.innerHTML = '';
     window.CHAPTERS.forEach((ch, idx) => {
@@ -118,23 +129,30 @@
       const prevStars = prev ? prev.stages.reduce((a, s) => a + (save.stars[s] || 0), 0) : 0;
       const locked = ch.needStars > prevStars;
       const box = mk('div', 'chapter' + (locked ? ' locked' : ''));
-      const h = mk('h2', '', t('ui.chapter') + ' ' + ch.id);
-      if (locked) h.appendChild(mk('small', '', '🔒 ' + t('ui.needStars', { n: ch.needStars }) + ' (' + prevStars + '/' + ch.needStars + ')'));
-      box.appendChild(h);
-      const row = mk('div', 'stage-row');
+      if (locked) {   // 잠긴 챕터: 한 줄로 필요 별 표시
+        const card = mk('div', 'stage-card m-stage locked');
+        card.appendChild(mk('span', 'chapter-tag', t('ui.chapter') + ' ' + ch.id));
+        const need = mk('span', 'need'); need.appendChild(img('assets/icons/mobile/lock.png'));
+        need.appendChild(mk('span', '', t('ui.needStars', { n: ch.needStars }) + ' (' + prevStars + '/' + ch.needStars + ')'));
+        card.appendChild(need); box.appendChild(card); list.appendChild(box); return;
+      }
+      const head = mk('div', 'chapter-head'); head.appendChild(mk('span', 'chapter-tag', t('ui.chapter') + ' ' + ch.id)); box.appendChild(head);
+      const rows = mk('div', 'stage-list');
       ch.stages.forEach(sid => {
-        const playable = !locked && !!window.STAGES[sid];
-        const card = mk(playable ? 'button' : 'div', 'stage-card' + (playable ? '' : ' off'));
-        card.appendChild(mk('div', 'num', String(sid)));
-        if (t('stageName.' + sid) && !locked) card.appendChild(mk('div', 'nm', t('stageName.' + sid)));
-        if (playable) { const st = mk('div', 'st'); st.innerHTML = starImgs(save.stars[sid] || 0); card.appendChild(st); card.onclick = () => startStory(sid); }
-        else if (!locked) card.appendChild(mk('div', 'soon', t('ui.comingSoon')));
-        row.appendChild(card);
+        const playable = !!window.STAGES[sid];
+        const card = mk(playable ? 'button' : 'div', 'stage-card m-stage' + (playable ? '' : ' soon'));
+        if (THUMB[sid]) card.appendChild(img(THUMB[sid], 'thumb'));
+        card.appendChild(mk('span', 'num', String(sid))); card.appendChild(mk('span', 'bar'));
+        card.appendChild(mk('span', 'nm', t('stageName.' + sid) || ''));
+        if (playable) { const st = mk('span', 'st'); st.innerHTML = starImgs(save.stars[sid] || 0); card.appendChild(st); card.onclick = () => startStory(sid); }
+        else { card.appendChild(mk('span', 'soon', t('ui.comingSoon'))); card.appendChild(img('assets/icons/chevron-right.png', 'go')); }
+        rows.appendChild(card);
       });
-      box.appendChild(row); list.appendChild(box);
+      box.appendChild(rows); list.appendChild(box);
     });
     renderCoins();
   }
+  $('btnBack').onclick = () => show('title');
 
   /* ══════════ 스토리 컷 ══════════ */
   const S = { stage: null, i: 0 };
@@ -239,7 +257,7 @@
     renderCoins();
   }
   const starsNow = () => Math.max(1, 3 - Math.floor(G.mistakes / 2));
-  const BADGE = { move: '⇆', growH: '↔', growV: '↕' };
+  const BADGE_IMG = { move: 'word-move', growH: 'word-grow-horizontal', growV: 'word-grow-vertical' };
   const place = (el, x, y, w, h) => { el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.width = w + 'px'; el.style.height = h + 'px'; };
   const bbox = cells => { const xs = cells.map(c => c[0]), ys = cells.map(c => c[1]); const x = Math.min.apply(null, xs), y = Math.min.apply(null, ys); return { x, y, w: Math.max.apply(null, xs) - x + 1, h: Math.max.apply(null, ys) - y + 1 }; };
   const cellsNow = b => (G.preview && G.preview.id === b.id ? G.preview.cells : b.cells);
@@ -254,11 +272,12 @@
       if (d.render === 'figure') {
         // 늘어나서 이어진 사물(모닥불·나뭇가지 등)은 원래 그림을 늘어난 칸만큼 잡아 늘린다
         const stretched = !d.parts && cells.length > (b.base || 1);
-        const groups = d.parts ? d.parts.map(p => ({ img: p.img, cells: p.cells.map(i => cells[i]) })) : [{ img: d.img, cells }];
+        const im = d.imgWarm && E.hasState(b, 'warm') ? d.imgWarm : d.img;
+        const groups = d.parts ? d.parts.map(p => ({ img: p.img, cells: p.cells.map(i => cells[i]) })) : [{ img: im, cells }];
         groups.forEach(gr => {
           const bb = bbox(gr.cells), f = mk('div', 'fig');
           place(f, bb.x * C + 3, bb.y * C + 3, bb.w * C - 6, bb.h * C - 6);
-          f.style.backgroundImage = 'url(assets/' + gr.img + ')';
+          f.style.backgroundImage = 'url(assets/' + gr.img + AV + ')';
           if (stretched) f.style.backgroundSize = '100% 100%';
           el.appendChild(f);
         });
@@ -266,7 +285,7 @@
         const Lf = E.has(cells, c[0] - 1, c[1]), Rt = E.has(cells, c[0] + 1, c[1]), Tp = E.has(cells, c[0], c[1] - 1), Bt = E.has(cells, c[0], c[1] + 1);
         const x0 = c[0] * C + (Lf ? 0 : 3), x1 = (c[0] + 1) * C - (Rt ? 0 : 3), y0 = c[1] * C + (Tp ? 0 : 3), y1 = (c[1] + 1) * C - (Bt ? 0 : 3);
         const tile = mk('div', 'tile'); place(tile, x0, y0, x1 - x0, y1 - y0);
-        tile.style.backgroundImage = 'url(assets/' + (d.render === 'tree' && i === 0 ? d.img2 : d.img) + ')';
+        tile.style.backgroundImage = 'url(assets/' + (d.render === 'tree' && i === 0 ? d.img2 : d.img) + AV + ')';
         tile.style.backgroundPosition = (c[0] * C + 3 - x0) + 'px ' + (c[1] * C + 3 - y0) + 'px';
         const r = v => (v ? '0' : '12px');
         tile.style.borderRadius = r(Lf || Tp) + ' ' + r(Rt || Tp) + ' ' + r(Rt || Bt) + ' ' + r(Lf || Bt);
@@ -293,11 +312,16 @@
       if (!G.known[b.id]) { el.classList.add('fresh'); G.known[b.id] = 1; }
       if (G.shake === b.id) el.classList.add('shake');
       if (dragKw && (!src || src.id !== b.id) && E.canEnchant(G.stage, b, dragKw)) el.classList.add('can');
-      if (E.hasState(b, 'warm')) E.parts(G.stage, b).forEach(pc => { const m = mk('div', 'warm-mark', '♨'); place(m, pc[0][0] * C + 92, pc[0][1] * C + 2, 44, 44); el.appendChild(m); el.classList.add('warm'); });
-      if (d.enchantable && BADGE[b.kw.yellow]) { const u = E.usesOf(b, b.kw.yellow), bd = mk('div', 'badge', BADGE[b.kw.yellow] + (u != null ? ' ' + u : '')); bd.style.left = last[0] * C + 88 + 'px'; bd.style.top = last[1] * C + 88 + 'px'; el.appendChild(bd); }
+      if (d.enchantable && BADGE_IMG[b.kw.yellow]) {
+        const u = E.usesOf(b, b.kw.yellow), bd = mk('div', 'badge'); bd.style.backgroundImage = 'url(assets/guides/' + BADGE_IMG[b.kw.yellow] + '.png)';
+        if (u != null) bd.appendChild(mk('span', 'cnt', String(u)));
+        bd.style.left = last[0] * C + 78 + 'px'; bd.style.top = last[1] * C + 78 + 'px'; el.appendChild(bd);
+      }
       if (G.fail && G.fail.ids.indexOf(b.id) >= 0) {
         el.classList.add('fail');
-        E.parts(G.stage, b).forEach(pc => { const bb = bbox(pc), f = mk('div', 'burn', '🔥'); place(f, bb.x * C + 3, bb.y * C + 3, bb.w * C - 6, bb.h * C - 6); el.appendChild(f); });
+        const person = d.category === 'person';
+        if (person) { const bb = bbox(cells), f = mk('div', 'burn'); place(f, bb.x * C + 3, bb.y * C + 3, bb.w * C - 6, bb.h * C - 6); f.style.backgroundImage = 'url(assets/fx/' + (bb.h > 1 ? 'burn-overlay-tall' : 'burn-overlay') + '.png)'; el.appendChild(f); }
+        else cells.forEach(c => { const f = mk('div', 'burn fire'); place(f, c[0] * C + 3, c[1] * C + 3, C - 6, C - 6); el.appendChild(f); });
       }
       layer.appendChild(el);
     });
@@ -340,6 +364,13 @@
       '<marker id="ah2" markerWidth="5" markerHeight="5" refX="2.8" refY="2.5" orient="auto"><path d="M5 0L0 2.5L5 5Z" fill="#f59a23"/></marker></defs>' + body;
     layer.appendChild(svg);
   }
+  /* 보드 위 일회성 연출: ignite(3프레임) / warming / blocked */
+  function fx(kind, where) {
+    let layer = $('fxLayer'); if (!layer) { layer = mk('div'); layer.id = 'fxLayer'; $('board').appendChild(layer); }
+    const cells = typeof where[0] === 'number' ? [where] : where, bb = bbox(cells);
+    const el = mk('div', 'fx fx-' + kind); place(el, bb.x * C, bb.y * C, bb.w * C, bb.h * C);
+    layer.appendChild(el); setTimeout(() => el.remove(), kind === 'ignite' ? 900 : 1300);
+  }
   function chip(kw, extra) { const el = mk('div', 'kw ' + KW[kw].color + (extra ? ' ' + extra : '')); el.dataset.kw = kw; el.appendChild(mk('span', '', t('kw.' + kw))); return el; }
   function renderTray() {
     const tray = $('tray'); tray.innerHTML = '';
@@ -361,7 +392,7 @@
     const list = [];
     if (b) {
       const d = E.def(G.stage, b);
-      $('insImg').style.backgroundImage = 'url(assets/' + (d.preview || d.img) + ')';
+      $('insImg').style.backgroundImage = 'url(assets/' + (d.preview || d.img) + AV + ')';
       $('insTag').textContent = t('cat.' + d.category); $('insName').textContent = t('block.' + b.type);
       ['yellow', 'blue', 'red', 'green'].forEach(c => { if (b.kw[c]) list.push(b.kw[c]); });
     }
@@ -376,9 +407,9 @@
       if (!kw) { kws.appendChild(mk('div', 'ks n-insslot')); continue; }
       const can = E.canTake(b, kw), el = chip(kw, 'ks' + (can ? ' takeable' : '') + (G.selKw === kw ? ' sel' : ''));
       const left = E.usesOf(b, kw);
-      if (can) { el.appendChild(mk('span', 'spark', '✨')); el.appendChild(mk('span', 'cnt', String(b.take[kw]))); }
+      if (can) { el.appendChild(mk('span', 'spark')); el.appendChild(mk('span', 'cnt', String(b.take[kw]))); }
       else if (left != null) el.appendChild(mk('span', 'cnt', String(left)));
-      else el.appendChild(mk('span', 'lock', '🔒'));
+      else el.appendChild(mk('span', 'lock'));
       el.addEventListener('pointerdown', e => wordDown(e, 'chip', kw, b.id, el));
       kws.appendChild(el);
     }
@@ -386,7 +417,7 @@
     if (G.selKw) {
       const title = chip(G.selKw);
       const own = b && (b.kw[KW[G.selKw].color] === G.selKw);
-      if (own && !E.canTake(b, G.selKw) && E.usesOf(b, G.selKw) == null && KW[G.selKw].kind !== 'state') title.appendChild(mk('span', 'lock', '🔒'));
+      if (own && !E.canTake(b, G.selKw) && E.usesOf(b, G.selKw) == null && KW[G.selKw].kind !== 'state') title.appendChild(mk('span', 'lock'));
       sk.appendChild(title);
       $('descTxt').innerHTML = richDesc(t('kwDesc.' + G.selKw)); fitText($('descTxt'), 26, 17);
     } else $('descTxt').textContent = '';
@@ -428,9 +459,14 @@
     if (G.sel && !E.get(G.state, G.sel)) G.sel = null;
     $('btnUndo').classList.remove('pulse'); $('btnSettings').classList.remove('pulse');
     renderGame();
+    res.events.filter(ev => ev.t === 'warm').forEach(ev => { const blk = E.get(G.state, ev.id); if (blk) fx('warming', blk.cells); });
     if (res.cleared) { onClear(); return true; }
     if (after) after(info, res);
     const comb = res.events.find(ev => ev.t === 'combine' && ev.type === 'campfire');
+    res.events.forEach(ev => {
+      const blk = E.get(G.state, ev.id); if (!blk) return;
+      if (ev.t === 'combine' && ev.type === 'campfire') blk.cells.forEach(c => fx('ignite', c));
+    });
     if (comb) tutCampfire(comb.id);
     if (E.stuck(G.state, G.stage)) { fb('stuck', 'worried'); $('btnUndo').classList.add('pulse'); $('btnSettings').classList.add('pulse'); }
     renderHUD(); renderBoard(); drawGuide();
@@ -563,7 +599,7 @@
       d.blocked = false;
       if (endC[ax] !== target) {   // 끝 칸 다음 칸에 다른 블록이 있어서 막혔는가
         const nx = endC.slice(); nx[ax] += Math.sign(target - endC[ax]);
-        const o = E.at(G.state, nx[0], nx[1]); d.blocked = !!(o && o.id !== b.id);
+        const o = E.at(G.state, nx[0], nx[1]); d.blocked = !!(o && o.id !== b.id); d.blockedAt = nx;
       }
       setPreview(b.id, cells);
     }
@@ -602,6 +638,7 @@
     if (d.mode === 'stuck') { G.shake = b.id; renderBoard(); fb('cantMove', 'worried'); setGuideVisible(true); return; }
     if (d.mode === 'move' || d.mode === 'grow') {
       const r = G.preview;
+      if (d.blocked && d.blockedAt) fx('blocked', d.blockedAt);
       if (!r || same(r.cells, b.cells)) { G.preview = null; renderBoard(); setGuideVisible(true); if (d.blocked) fb('occupied', 'worried'); return; }
       const mode = d.mode;
       guideHidden = false;
@@ -628,20 +665,28 @@
     return steam && steam.cells.length > 1 ? 0 : 1;
   }
   $('btnHint').onclick = () => { if (!G.busy && !G.cleared) openHints(); };
+  const HINT_ICON = ['assets/icons/mobile/hint-look.png', 'assets/icons/mobile/hint-keyword.png', 'assets/icons/mobile/hint-next.png'];
   function openHints() {
     const ph = hintPhase(), texts = t(tk('hints'))[ph], lv = t('ui.hintLv');
     G.hints[ph] = G.hints[ph] || {};
     openModal(box => {
-      box.appendChild(mk('h2', '', t('ui.hint')));
+      box.appendChild(img('assets/portraits/cache-surprised.png', 'pop-cache'));
+      box.appendChild(img('assets/icons/hint.png', 'pop-bulb'));
+      const close = mk('button', 'pop-close'); close.appendChild(img('assets/icons/mobile/close.png')); close.onclick = closeModal; box.appendChild(close);
+      const title = mk('div', 'pop-title');
+      title.appendChild(img('assets/decor/mobile/button-leaf.png', 'sprig')); title.appendChild(mk('span', '', t('ui.hint'))); title.appendChild(img('assets/decor/mobile/button-leaf.png', 'sprig flip'));
+      box.appendChild(title);
       const free = G.stage.id === 1;
       if (free) box.appendChild(mk('div', 'hint-free', t('ui.hintFree')));
       texts.forEach((tx, i) => {
-        const row = mk('div', 'hint-item'); row.appendChild(mk('b', '', (i + 1) + '. ' + lv[i]));
+        const row = mk('div', 'hint-item m-row');
+        row.appendChild(img(HINT_ICON[i], 'ico')); row.appendChild(mk('i', 'bar'));
         if (G.hints[ph][i]) row.appendChild(mk('span', '', tx));
         else {
-          row.appendChild(mk('span', '', '· · ·'));
-          const buy = mk('button');
-          if (free) buy.textContent = t('ui.hintShow'); else buy.innerHTML = '<img src="assets/icons/coin.png" alt="">' + CONFIG.hintCost[i];
+          row.appendChild(mk('b', '', (i + 1) + '. ' + lv[i]));
+          row.appendChild(mk('span', ''));
+          const buy = mk('button', 'm-amber');
+          if (free) buy.textContent = t('ui.hintShow'); else { buy.appendChild(img('assets/icons/coin.png')); buy.appendChild(mk('span', '', String(CONFIG.hintCost[i]))); }
           buy.onclick = () => {
             if (free) { G.hints[ph][i] = 1; openHints(); return; }
             if (save.coins < CONFIG.hintCost[i]) { toast(t('ui.noCoin')); closeModal(); if (!G.waiting) fb('noCoin', 'worried'); return; }
@@ -651,7 +696,7 @@
         }
         box.appendChild(row);
       });
-      const c = mk('button', 'n-btn small-btn', t('ui.close')); c.onclick = closeModal; box.appendChild(c);
+      box.appendChild(popButton('m-cream pop-close-btn', null, t('ui.close'), closeModal));
     });
   }
 
@@ -799,6 +844,7 @@
     else if (g.k === 'pull' && blk) { a = cellCenter(g.from); b = cellCenter(g.to); }
     else if (g.k === 'undo') { a = centerOf($('btnUndo')); a.y += 20; }
     if (!a) return;
+    fg.src = 'assets/guides/' + (b ? 'drag-finger' : 'tap-finger') + '.png';
     fg.style.display = 'block';
     const tr = p => 'translate(' + p.x + 'px,' + p.y + 'px)';
     fingerAnim = b
