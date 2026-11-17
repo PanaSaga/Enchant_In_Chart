@@ -1,0 +1,169 @@
+{
+  "dpi": 72,
+  "sliceOrder": [
+    "top",
+    "right",
+    "bottom",
+    "left"
+  ],
+  "assets": {
+    "illustrations/cover-vignette": {
+      "file": "illustrations/cover-vignette.png",
+      "width": 1600,
+      "height": 1288,
+      "use": "cover"
+    },
+    "illustrations/clear-vignette": {
+      "file": "illustrations/clear-vignette.png",
+      "width": 1600,
+      "height": 1036,
+      "use": "clear"
+    },
+    "icons/mobile/hint-look": {
+      "file": "icons/mobile/hint-look.png",
+      "width": 256,
+      "height": 248
+    },
+    "icons/mobile/hint-keyword": {
+      "file": "icons/mobile/hint-keyword.png",
+      "width": 256,
+      "height": 204
+    },
+    "icons/mobile/hint-next": {
+      "file": "icons/mobile/hint-next.png",
+      "width": 256,
+      "height": 196
+    },
+    "icons/mobile/journal": {
+      "file": "icons/mobile/journal.png",
+      "width": 256,
+      "height": 268
+    },
+    "icons/mobile/close": {
+      "file": "icons/mobile/close.png",
+      "width": 256,
+      "height": 260
+    },
+    "icons/mobile/lock": {
+      "file": "icons/mobile/lock.png",
+      "width": 256,
+      "height": 304
+    },
+    "stage-thumbnails/rain": {
+      "file": "stage-thumbnails/rain.png",
+      "width": 256,
+      "height": 256
+    },
+    "stage-thumbnails/river": {
+      "file": "stage-thumbnails/river.png",
+      "width": 256,
+      "height": 256
+    },
+    "decor/mobile/header-leaves": {
+      "file": "decor/mobile/header-leaves.png",
+      "width": 1600,
+      "height": 488
+    },
+    "decor/mobile/journal-bookmark": {
+      "file": "decor/mobile/journal-bookmark.png",
+      "width": 256,
+      "height": 312
+    },
+    "decor/mobile/journal-latch": {
+      "file": "decor/mobile/journal-latch.png",
+      "width": 256,
+      "height": 176
+    },
+    "decor/mobile/clear-crest": {
+      "file": "decor/mobile/clear-crest.png",
+      "width": 1600,
+      "height": 448
+    },
+    "ui/mobile/journal-panel": {
+      "file": "ui/mobile/journal-panel.png",
+      "width": 512,
+      "height": 512,
+      "slice": [
+        92,
+        92,
+        92,
+        92
+      ]
+    },
+    "ui/mobile/action-primary": {
+      "file": "ui/mobile/action-primary.png",
+      "width": 144,
+      "height": 144,
+      "slice": [
+        46,
+        46,
+        46,
+        46
+      ]
+    },
+    "ui/mobile/amber-chip": {
+      "file": "ui/mobile/amber-chip.png",
+      "width": 144,
+      "height": 144,
+      "slice": [
+        47,
+        47,
+        47,
+        47
+      ]
+    },
+    "logos/title-ko": {
+      "file": "logos/title-ko.png",
+      "width": 1600,
+      "height": 336
+    }
+  },
+  "reuseFromExistingAssets": {
+    "cover": [
+      "decor/greenhouse.png",
+      "decor/moss-strip.png",
+      "ui/category-tag.png"
+    ],
+    "stageSelect": [
+      "decor/greenhouse.png",
+      "decor/moss-strip.png",
+      "decor/books.png",
+      "decor/terrarium.png",
+      "icons/coin.png",
+      "icons/settings.png",
+      "icons/chevron-left.png",
+      "icons/chevron-right.png",
+      "icons/star.png",
+      "icons/star-off.png",
+      "tiles/campfire.png",
+      "ui/description-frame.png",
+      "ui/icon-button.png",
+      "ui/category-tag.png"
+    ],
+    "hint": [
+      "portraits/cache-neutral.png",
+      "icons/coin.png",
+      "icons/hint.png",
+      "ui/description-frame.png",
+      "ui/category-tag.png",
+      "ui/icon-button.png"
+    ],
+    "settings": [
+      "icons/settings.png",
+      "icons/undo.png",
+      "ui/description-frame.png",
+      "ui/category-tag.png",
+      "ui/icon-button.png"
+    ],
+    "clear": [
+      "decor/greenhouse.png",
+      "decor/moss-strip.png",
+      "icons/star.png",
+      "icons/star-off.png",
+      "icons/coin.png",
+      "ui/hud-pill.png",
+      "ui/description-frame.png",
+      "ui/icon-button.png"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+# 같은 내용이 폴더로 이미 들어 있는 압축본
+*.zip
+
+# 로컬 도구 설정
+.claude/
+
+# 리소스 생성 도구의 작업용 파일
+/.export-*.py
+/.remaining-*.png
+
+# OS 잡파일
+Thumbs.db
+desktop.ini
+.DS_Store
