@@ -1,0 +1,124 @@
+{
+  "sampleRate": 48000,
+  "bgm": {
+    "greenhouse": {
+      "files": {
+        "ogg": "audio/bgm/greenhouse.ogg",
+        "mp3": "audio/bgm/greenhouse.mp3"
+      },
+      "bpm": 76,
+      "timeSignature": "4/4",
+      "loop": false,
+      "durationMs": 43368
+    },
+    "frosted-grid": {
+      "files": {
+        "ogg": "audio/bgm/frosted-grid.ogg",
+        "mp3": "audio/bgm/frosted-grid.mp3"
+      },
+      "bpm": 78,
+      "timeSignature": "3/4",
+      "loop": false,
+      "durationMs": 32592,
+      "title": "Forest Grid (music box)"
+    },
+    "story-glow": {
+      "files": {
+        "ogg": "audio/bgm/story-glow.ogg",
+        "mp3": "audio/bgm/story-glow.mp3"
+      },
+      "bpm": 92,
+      "timeSignature": "4/4",
+      "loop": false,
+      "durationMs": 36204,
+      "title": "Story Glow (light piano and strings)"
+    }
+  },
+  "sfx": {
+    "ui-tap": {
+      "file": "audio/sfx/ui-tap.wav",
+      "durationMs": 1608,
+      "character": "clay"
+    },
+    "dialogue-next": {
+      "file": "audio/sfx/dialogue-next.wav",
+      "durationMs": 2392,
+      "character": "double drop"
+    },
+    "select-block": {
+      "file": "audio/sfx/select-block.wav",
+      "durationMs": 1815,
+      "character": "soft bounce"
+    },
+    "keyword-copy": {
+      "file": "audio/sfx/keyword-copy.wav",
+      "durationMs": 2739,
+      "character": "drop triplet"
+    },
+    "keyword-apply": {
+      "file": "audio/sfx/keyword-apply.wav",
+      "durationMs": 3547,
+      "character": "glass chime"
+    },
+    "block-move": {
+      "file": "audio/sfx/block-move.wav",
+      "durationMs": 2075,
+      "character": "clay brush"
+    },
+    "block-grow": {
+      "file": "audio/sfx/block-grow.wav",
+      "durationMs": 2780,
+      "character": "rising soft bounces"
+    },
+    "block-split": {
+      "file": "audio/sfx/block-split.wav",
+      "durationMs": 2013,
+      "character": "clay ASMR"
+    },
+    "undo": {
+      "file": "audio/sfx/undo.wav",
+      "durationMs": 2364,
+      "character": "descending drop"
+    },
+    "blocked": {
+      "file": "audio/sfx/blocked.wav",
+      "durationMs": 2082,
+      "character": "soft low thud"
+    },
+    "cold-tremble": {
+      "file": "audio/sfx/cold-tremble.wav",
+      "durationMs": 2871,
+      "character": "beaded water"
+    },
+    "ignite": {
+      "file": "audio/sfx/ignite.wav",
+      "durationMs": 3361,
+      "character": "warm rustle"
+    },
+    "warm-recover": {
+      "file": "audio/sfx/warm-recover.wav",
+      "durationMs": 4610,
+      "character": "gentle bells"
+    },
+    "hint-open": {
+      "file": "audio/sfx/hint-open.wav",
+      "durationMs": 3539,
+      "character": "taps then bell"
+    },
+    "coin-get": {
+      "file": "audio/sfx/coin-get.wav",
+      "durationMs": 2962,
+      "character": "two little bells"
+    },
+    "star-get": {
+      "file": "audio/sfx/star-get.wav",
+      "durationMs": 4159,
+      "character": "bright bell chord"
+    },
+    "stage-clear": {
+      "file": "audio/sfx/stage-clear.wav",
+      "durationMs": 5110,
+      "character": "piano cadence"
+    }
+  }
+}
