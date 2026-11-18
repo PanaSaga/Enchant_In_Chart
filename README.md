@@ -37,8 +37,10 @@ git subtree push --prefix web origin gh-pages
 | `web/js/engine.js` | 규칙 엔진 |
 | `web/js/game.js` | 화면·입력·튜토리얼 |
 | `web/js/i18n.js` | 한국어·영어·일본어 텍스트 |
-| `기획서/` | 기획서, 1스테이지 텍스트, 추가 이미지 리소스 목록 |
-| `web-assets-*`, `mobile-ui-assets/`, `ui-key-visuals-mobile/` | 원본 이미지 리소스 |
+| `기획서/` | 기획서(md), 1스테이지 텍스트, 추가 이미지 리소스 목록 |
+| `save/image/` | 원본 이미지 리소스 보관 (UI·장식·효과·일러스트 등) |
+| `save/mobile-audio-fairytale/` | 원본 오디오 보관 |
+| `save/기획서/` | 기획서·개선안 pptx, pdf 보관 |
 
 ## 현재 범위
 
